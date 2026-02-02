@@ -6,7 +6,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// API
+// API route
 app.get("/api/news", (req, res) => {
     res.json({
         status: "success",
@@ -17,16 +17,18 @@ app.get("/api/news", (req, res) => {
     });
 });
 
-// Serve frontend (after build)
-app.use(express.static(
-    path.join(__dirname, "../frontend/dist")
-));
+// Serve frontend build
+const frontendPath = path.join(__dirname, "../frontend/dist");
+app.use(express.static(frontendPath));
 
-app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+// ❌ REMOVE app.get("*")
+
+// ✅ SAFE fallback
+app.use((req, res) => {
+    res.sendFile(path.join(frontendPath, "index.html"));
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () =>
-    console.log("Server running on port", PORT)
-);
+app.listen(PORT, () => {
+    console.log("Server running on port", PORT);
+});
